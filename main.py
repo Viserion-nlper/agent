@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 from core.ToolInterface import BaseTool
+from rag import EmbeddingRAG
 sys.path.append(str(Path(__file__).parent.parent))
 
 
@@ -25,7 +26,20 @@ class GraphTextTool(BaseTool):
     def execute(self, params: Dict) -> str:
         # 这里实现获取书籍图书馆数据
         return "2025年图书馆书籍内容：《Python编程从入门到实践》"
-    
+
+
+
+# 定义EmbeddingRAG类
+class RAGTool(BaseTool):
+    """嵌入式RAG工具"""
+    name: str = "embedding_rag"
+    description: str = "使用嵌入式RAG技术进行信息检索和生成"
+
+    def execute(self, params: Dict) -> str:
+        # 这里实现嵌入式RAG的逻辑
+        RAGChat = EmbeddingRAG().chat()
+        return "嵌入式RAG技术可以通过向量化文本数据来提高信息检索的效率和准确性。"
+    pass
 if __name__ == "__main__":
 
 
