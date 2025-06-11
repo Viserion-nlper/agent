@@ -4,6 +4,9 @@ import numpy as np
 
 import os
 from dotenv import dotenv_values
+
+from Qwen3_Embedding import Qwen3_Embedding_tool
+
 env_variables = dotenv_values('.env')
 for var in env_variables:
     print(var)
@@ -52,3 +55,19 @@ class ZhipuEmbedding(BaseEmbeddings):
         input=text,
         )
         return response.data[0].embedding
+    
+class Qwen3Embedding(BaseEmbeddings):
+    """
+    class for Qwen3 embeddings
+    """
+    def __init__(self, path: str = '', is_api: bool = True, embedding_dim = 2048) -> None:
+        super().__init__(path, is_api)
+        self.embedding_dim = embedding_dim
+        
+
+    def get_embedding(self, text: str) -> List[float]:
+        model_path = '/Users/mac/.cache/modelscope/hub/models/Qwen/Qwen3-Embedding-0___6B'
+        model = Qwen3_Embedding_tool(model_path)
+        dim = 1024
+        response = model.encode(text, is_query=True, dim=dim)
+        return response.tolist()[0]
