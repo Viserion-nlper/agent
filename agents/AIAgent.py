@@ -61,8 +61,9 @@ class AIAgent(BaseAgent):
         """注册工具"""
         self.tool_agent.register_tool(tool)
 
-    def call_tool(self, tool_name: str, params: Dict) -> str:
+    def call_tool(self, params: Dict) -> str:
         """调用工具"""
         return self.tool_agent.run(
-            f"调用工具{tool_name}，参数: {json.dumps(params, ensure_ascii=False)}"
+            # json.dumps({"query": params}, ensure_ascii=False)
+            params
         )

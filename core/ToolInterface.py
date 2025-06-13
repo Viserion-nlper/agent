@@ -16,4 +16,5 @@ class ToolCall(BaseModel):
     """工具调用元数据"""
     name: List[str] = Field(..., description="工具名称，可以是单个工具或多个工具的组合")
     parameters: Dict
+    query: str = Field(..., description="用户查询")
     call_id: str

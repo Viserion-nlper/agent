@@ -17,6 +17,7 @@ class ToolCallAgent:
 
     def _make_llm_decision(self, query: str) -> Optional[Dict]:
         """使用LLM决定是否调用工具"""
+        # self.available_tools.values()是注册的所有工具的列表
         tools_prompt = "\n".join(
             f"- {tool.name}: {tool.description}" 
             for tool in self.available_tools.values()
@@ -46,8 +47,9 @@ class ToolCallAgent:
             "need_tool": true,
             "tool_name": ["weather", "database"],
             "parameters": {{"location": "Beijing", "query": "sales"}}
-        }}"""
-
+        }}
+        """
+        
         
         response = self.response_generator.generate({
             "model": "qwen2",
@@ -55,9 +57,14 @@ class ToolCallAgent:
             "temperature": 0.7,
             "stream": False
         })
-        
+        response = json.loads(response)
+        if not isinstance(response, dict):
+            return None
+        # 确保返回的JSON格式正确
+        else:
+            response.update({"query":query})
         try:
-            return json.loads(response)
+            return response
         except json.JSONDecodeError:
             return None
 
@@ -68,6 +75,7 @@ class ToolCallAgent:
             return ToolCall(
                 name=decision["tool_name"],
                 parameters=decision["parameters"],
+                query=decision.get("query", query),
                 call_id=f"call_{len(self.memory)}"
             )
         return None
@@ -94,7 +102,7 @@ class ToolCallAgent:
                 if not tool:
                     return f"Error: Tool {tool_name} not found"
                 try:
-                    tool_result = tool.execute(tool_call.parameters)
+                    tool_result = tool.execute(tool_call.query)
                     results.append(tool_result)
                 except Exception as e:
                     return f"Tool {tool_name} execution failed: {str(e)}"
