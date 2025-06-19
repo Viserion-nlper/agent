@@ -1,11 +1,31 @@
-# 基于Schema的三元组抽取系统
+# 基于Schema的知识图谱构建系统 (KAG)
 
-## 功能概述
-本系统提供从非结构化文本中抽取符合预定义Schema的三元组(实体-关系-实体)的能力，主要包含以下功能：
-- 命名实体识别
-- 实体标准化
-- 关系抽取 
-- 子图构建
+## 项目概述
+KAG(Knowledge Acquisition Graph)是一个基于Schema的三元组抽取和知识图谱构建系统，主要功能包括：
+- 从非结构化文本中抽取符合预定义Schema的三元组(实体-关系-实体)
+- 实体标准化和关系验证
+- 知识图谱构建和存储
+- 支持自定义Schema和扩展
+
+## 核心功能
+1. **Schema定义**：支持灵活定义实体类型、属性和关系
+2. **三元组抽取**：
+   - 命名实体识别
+   - 实体标准化
+   - 关系抽取
+3. **向量化服务**：支持文本向量化
+4. **知识图谱构建**：支持将抽取结果构建为知识图谱
+
+## 架构设计
+```
+├── schema_based_extractor.py  # 核心抽取逻辑
+├── common/
+│   ├── llm/                  # LLM客户端实现
+│   └── vectorize_model/      # 向量化模型
+├── templates/               # 项目模板
+├── examples/                 # 示例配置和Schema
+└── configs/                 # 配置文件
+```
 
 ## 快速开始
 
@@ -17,60 +37,52 @@ pip install -r requirements.txt
 ### 2. 定义Schema
 在`schema_definitions.py`中定义您的领域Schema，示例：
 ```python
-SCHEMA = {
+SCHEMA_DEFINITIONS = {
     "人物": {
-        "properties": [...],
-        "relations": [...]
-    },
-    "公司": {...}
+        "properties": [
+            {"name": "姓名", "type": "string", "required": True}
+        ],
+        "relations": [
+            {"type": "任职", "domain": "人物", "range": "公司"}
+        ]
+    }
 }
 ```
 
-### 3. 初始化抽取器
+### 3. 配置系统
+编辑`zhiqiang_config.yaml`：
+```yaml
+llm:
+  type: mock  # 使用模拟LLM
+
+vectorize_model:
+  type: mock
+  vector_dimensions: 768
+```
+
+### 4. 运行抽取
 ```python
 from schema_based_extractor import SchemaBasedExtractor
 from example_schema import SCHEMA_DEFINITIONS
 
-# 初始化LLM客户端 (需自行实现)
-llm_client = YourLLMClient() 
-
-# 创建抽取器
 extractor = SchemaBasedExtractor(
     schema=SCHEMA_DEFINITIONS,
-    llm_client=llm_client
+    llm_client=YourLLMClient()
 )
-```
 
-### 4. 执行抽取
-```python
 text = "马云是阿里巴巴集团的创始人"
 result = extractor.extract_triples(text)
-
-# 输出结果
-print("识别实体:", result["entities"]) 
-print("识别关系:", result["relations"])
 ```
 
-## 核心接口说明
+## 配置说明
+- **LLM配置**：支持OpenAI等LLM服务
+- **向量化配置**：支持多种向量化模型
+- **日志配置**：可调整日志级别
 
-### SchemaBasedExtractor类
-- `named_entity_recognition(text: str)`: 识别文本中的实体
-- `entity_standardization(text, entities)`: 标准化识别出的实体
-- `relation_extraction(text, entities)`: 抽取实体间关系
-- `extract_triples(text)`: 完整的三元组抽取流程
+## 高级用法
+1. **自定义抽取器**：继承`SchemaBasedExtractor`类
+2. **批量处理**：支持批量文本处理
+3. **性能优化**：缓存、并行处理等
 
-## 高级配置
-
-### 自定义抽取策略
-继承`SchemaBasedExtractor`类并重写相关方法：
-```python
-class CustomExtractor(SchemaBasedExtractor):
-    def named_entity_recognition(self, text):
-        # 自定义实体识别逻辑
-        ...
-```
-
-### 性能优化建议
-1. 批量处理文本提高效率
-2. 对长文本先进行分块处理
-3. 缓存频繁出现的实体识别结果
+## 示例
+见`examples/`目录下的示例配置和Schema定义
