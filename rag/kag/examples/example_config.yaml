@@ -1,18 +1,18 @@
 #------------project configuration start----------------#
 openie_llm: &openie_llm
-  api_key: sk-2ba1960eb13f42fe9da1cb158041fa2e
+  api_key: 
   base_url: https://api.deepseek.com
   model: deepseek-chat
   type: maas
 
 chat_llm: &chat_llm
-  api_key: sk-2ba1960eb13f42fe9da1cb158041fa2e
+  api_key: 
   base_url: https://api.deepseek.com
   model: deepseek-chat
   type: maas
 
 vectorize_model: &vectorize_model
-  api_key: sk-lsxqelzyejatisqbtevcxkgsnrnfibucukoyiengbvardqil
+  api_key: 
   base_url: https://api.siliconflow.cn/v1/
   model: BAAI/bge-m3
   type: openai
